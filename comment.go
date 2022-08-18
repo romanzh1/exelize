@@ -112,10 +112,11 @@ func (f *File) AddComment(sheet, cell, format string) error {
 		// The worksheet already has a comments relationships, use the relationships drawing ../drawings/vmlDrawing%d.vml.
 		sheetRelationshipsDrawingVML = f.getSheetRelationshipsTargetByID(sheet, ws.LegacyDrawing.RID)
 		commentID, _ = strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(sheetRelationshipsDrawingVML, "../drawings/vmlDrawing"), ".vml"))
-		drawingVML = strings.Replace(sheetRelationshipsDrawingVML, "..", "xl", -1)
+		drawingVML = strings.ReplaceAll(sheetRelationshipsDrawingVML, "..", "xl")
 	} else {
 		// Add first comment for given sheet.
-		sheetRels := "xl/worksheets/_rels/" + strings.TrimPrefix(f.sheetMap[trimSheetName(sheet)], "xl/worksheets/") + ".rels"
+		sheetXMLPath, _ := f.getSheetXMLPath(sheet)
+		sheetRels := "xl/worksheets/_rels/" + strings.TrimPrefix(sheetXMLPath, "xl/worksheets/") + ".rels"
 		rID := f.addRels(sheetRels, SourceRelationshipDrawingVML, sheetRelationshipsDrawingVML, "")
 		f.addRels(sheetRels, SourceRelationshipComments, sheetRelationshipsComments, "")
 		f.addSheetNameSpace(sheet, SourceRelationship)
@@ -177,20 +178,20 @@ func (f *File) addDrawingVML(commentID int, drawingVML, cell string, lineCount, 
 				},
 			},
 		}
-	}
-	// load exist comment shapes from xl/drawings/vmlDrawing%d.vml (only once)
-	d := f.decodeVMLDrawingReader(drawingVML)
-	if d != nil {
-		for _, v := range d.Shape {
-			s := xlsxShape{
-				ID:          "_x0000_s1025",
-				Type:        "#_x0000_t202",
-				Style:       "position:absolute;73.5pt;width:108pt;height:59.25pt;z-index:1;visibility:hidden",
-				Fillcolor:   "#fbf6d6",
-				Strokecolor: "#edeaa1",
-				Val:         v.Val,
+		// load exist comment shapes from xl/drawings/vmlDrawing%d.vml (only once)
+		d := f.decodeVMLDrawingReader(drawingVML)
+		if d != nil {
+			for _, v := range d.Shape {
+				s := xlsxShape{
+					ID:          "_x0000_s1025",
+					Type:        "#_x0000_t202",
+					Style:       "position:absolute;73.5pt;width:108pt;height:59.25pt;z-index:1;visibility:hidden",
+					Fillcolor:   "#fbf6d6",
+					Strokecolor: "#edeaa1",
+					Val:         v.Val,
+				}
+				vml.Shape = append(vml.Shape, s)
 			}
-			vml.Shape = append(vml.Shape, s)
 		}
 	}
 	sp := encodeShape{

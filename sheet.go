@@ -455,6 +455,22 @@ func (f *File) getSheetMap() map[string]string {
 	return maps
 }
 
+// getSheetXMLPath provides a function to get XML file path by given sheet
+// name.
+func (f *File) getSheetXMLPath(sheet string) (string, bool) {
+	var (
+		name string
+		ok   bool
+	)
+	for sheetName, filePath := range f.sheetMap {
+		if strings.EqualFold(sheetName, sheet) {
+			name, ok = filePath, true
+			break
+		}
+	}
+	return name, ok
+}
+
 // SetSheetBackground provides a function to set background picture by given
 // worksheet name and file path.
 func (f *File) SetSheetBackground(sheet, picture string) error {
