@@ -1,4 +1,4 @@
-module github.com/romanzh1/excelize/v2
+module github.com/romanzh1/exelize/v2
 
 go 1.15
 
@@ -14,4 +14,4 @@ require (
 	golang.org/x/text v0.3.7
 )
 
-replace github.com/xuri/excelize/v2 v2.6.0 => github.com/romanzh1/excelize/v2 v2.6.0
+// replace github.com/xuri/excelize/v2 v2.6.0 => github.com/romanzh1/excelize/v2 v2.6.0
